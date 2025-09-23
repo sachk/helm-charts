@@ -1,0 +1,19 @@
+{{- if and .Values.kong.enabled .Values.istio.enabled }}
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: {{ include "supabase.fullname" . }}-api
+  namespace: {{ .Release.Namespace }}
+spec:
+  hosts:
+    - {{ .Values.istio.hosts.api | quote }}
+  gateways:
+    - {{ .Values.istio.gateway | quote }}
+  http:
+    - name: kong-gateway
+      route:
+        - destination:
+            host: {{ include "supabase.fullname" . }}-supabase-kong
+            port:
+              number: {{ .Values.kong.service.port }}
+{{- end }}

@@ -18,99 +18,102 @@ secret:
   # jwt will be used to reference secret in multiple services:
   # Anon & Service key: Studio, Storage, Kong
   # JWT Secret: Analytics, Auth, Rest, Realtime, Storage
+  # IMPORTANT: JWT tokens must be generated manually using generate-jwt.sh script
+  # or created as Kubernetes secrets. Random strings will NOT work.
   jwt:
     anonKey: ""
     serviceKey: ""
     secret: ""
     # specify existing secret, which takes precedence over variables above
-    # secretRef: ""
+    secretRef: "supabase-jwt"
     # override secret keys for existing secret refs
-    # secretRefKey:
-      # anonKey: anonKey
-      # serviceKey: serviceKey
-      # secret: secret
+    secretRefKey:
+      anonKey: anonKey
+      serviceKey: serviceKey
+      secret: secret
   # database admin user credentials
   # these fields must be provided even if using external database
   db:
     password: ""
-    # secretRef: ""
+    secretRef: "supabase-db"
     # override secret keys for existing secret refs
-    # secretRefKey:
-      # password: password
+    secretRefKey:
+      password: password
   # analytics Logflare API key
   analytics:
     # these cannot be the same value
     privateApiKey: ""
     publicApiKey: ""
     # specify existing secret, which takes precedence over variable above
-    # secretRef: ""
+    secretRef: "supabase-analytics"
     # override secret keys for existing secret refs
-    # secretRefKey:
-      # privateApiKey: privateApiKey
-      # publicApiKey: publicApiKey
+    secretRefKey:
+      privateApiKey: privateApiKey
+      publicApiKey: publicApiKey
   # smtp will be used to reference secret including smtp credentials
   smtp:
     username: ""
     password: ""
     # specify existing secret, which takes precedence over variables above
-    # secretRef: ""
+    secretRef: "supabase-smtp"
     # override secret keys for existing secret refs
-    # secretRefKey:
-      # username: username
-      # password: password
+    secretRefKey:
+      username: username
+      password: password
   # secret used to access the studio dashboard
   # leave it empty to disable dashboard authentication
   dashboard:
     username: ""
     password: ""
     # specify existing secret, which takes precedence over variables above
-    # secretRef: ""
+    secretRef: "supabase-dashboard"
     # override secret keys for existing secret refs
-    # secretRefKey:
-      # username: username
-      # password: password
-  # S3 credentials for storage object bucket
-  s3:
-    keyId: ""
-    accessKey: ""
-    # specify existing secret, which takes precedence over variables above
-    # secretRef: ""
-    # override secret keys for existing secret refs
-    # secretRefKey:
-      # keyId: keyId
-      # accessKey: accessKey
+    secretRefKey:
+      username: username
+      password: password
+  #S3 credentials for storage object bucket (only needed if using S3/minio - disabled)
+  #s3:
+  #  keyId: ""
+  #  accessKey: ""
+  #  # specify existing secret, which takes precedence over variables above
+  #  # secretRef: ""
+  #  # override secret keys for existing secret refs
+  #  # secretRefKey:
+  #  # keyId: keyId
+  #  # accessKey: accessKey
   pooler:
     vaultEncKey: ""
-    # secretRef: ""
+    secretRef: "supabase-pooler"
     # override secret keys for existing secret refs
-    # secretRefKey:
-      # vaultEncKey: vaultEncKey
-  realtime:
-    dbEncKey: ""
-    secretKeyBase: ""
-    # override secret keys for existing secret refs
-    # secretRef: ""
-    # secretRefKey:
-      # dbEncKey: dbEncKey
-      # secretKeyBase: secretKeyBase
+    secretRefKey:
+      vaultEncKey: vaultEncKey
+  # Realtime secrets (present to avoid nil pointer; service remains disabled unless realtime.enabled: true)
+  #realtime:
+  #  dbEncKey: ""
+  #  secretKeyBase: ""
+  #  secretRef: ""
+  #  secretRefKey:
+  #    dbEncKey: dbEncKey
+  #    secretKeyBase: secretKeyBase
 
-external_db:
-  # Override the database hostname if using external database
-  host: "DATABASE.NAMESPACE.svc.cluster.local"
-  port: 5432
-  # https://www.postgresql.org/docs/current/libpq-ssl.html
-  # Allowed values: verify-ca, verify-full, disable, allow, prefer, require
-  sslmode: disable
-  # The 'postgres' is hardcoded in the supabase/postgres container
-  database: "postgres"
-  # The non-root user for postgres, additional users should be created with db init, see:
-  # https://github.com/supabase/supabase/blob/master/docker/volumes/db/roles.sql
-  username: "supabase_admin"
-  password: ""
-  # secretRef: ""
-  # override secret keys for existing secret refs
-  # secretRefKey:
-    # password: password
+# External database configuration (disabled - using internal db.enabled: true)
+# external_db:
+#   # Override the database hostname if using external database
+#   host: "DATABASE.NAMESPACE.svc.cluster.local"
+#   port: 5432
+#   # https://www.postgresql.org/docs/current/libpq-ssl.html
+#   # Allowed values: verify-ca, verify-full, disable, allow, prefer, require
+#   sslmode: disable
+#   # The 'postgres' is hardcoded in the supabase/postgres container
+#   database: "postgres"
+#   # The non-root user for postgres, additional users should be created with db init, see:
+#   # https://github.com/supabase/supabase/blob/master/docker/volumes/db/roles.sql
+#   username: "supabase_admin"
+#   password: ""
+#   # secretRef: ""
+#   # override secret keys for existing secret refs
+#   # secretRefKey:
+#   # password: password
 
 init_db:
   image:
@@ -129,7 +132,7 @@ db:
   image:
     repository: supabase/postgres
     pullPolicy: IfNotPresent
-    tag: "17.4.1.078"
+    tag: "17.6.1.005"
   imagePullSecrets: []
   replicaCount: 1
   nameOverride: ""
@@ -218,7 +221,7 @@ studio:
   image:
     repository: supabase/studio
     pullPolicy: IfNotPresent
-    tag: "2025.09.01-sha-8bf1fd5"
+    tag: "2025.09.22-sha-7b3007d"
   imagePullSecrets: []
   replicaCount: 1
   nameOverride: ""
@@ -263,10 +266,11 @@ studio:
     DEFAULT_ORGANIZATION_NAME: Default Organization
     DEFAULT_PROJECT_NAME: Default Project
     STUDIO_PORT: "3000"
-    SUPABASE_PUBLIC_URL: http://example.com
+    SUPABASE_URL: https://api.paper.observer
+    SUPABASE_PUBLIC_URL: https://api.paper.observer
     NEXT_PUBLIC_ENABLE_LOGS: "true"
     # Set value to bigquery to use Big Query backend for analytics
-    NEXT_ANALYTICS_BACKEND_PROVIDER: postgres  # postgres, bigquery
+    NEXT_ANALYTICS_BACKEND_PROVIDER: postgres # postgres, bigquery
   # volumeMounts:
   #   - name: volume_name
   #     mountPath: /path/to/my/secret
@@ -348,10 +352,10 @@ auth:
     type: ClusterIP
     port: 9999
   environment:
-    API_EXTERNAL_URL: http://example.com
+    API_EXTERNAL_URL: https://api.paper.observer
     GOTRUE_API_HOST: "0.0.0.0"
     GOTRUE_API_PORT: "9999"
-    GOTRUE_SITE_URL: http://example.com
+    GOTRUE_SITE_URL: https://paper.observer
     GOTRUE_URI_ALLOW_LIST: "*"
     GOTRUE_DISABLE_SIGNUP: "false"
     GOTRUE_JWT_DEFAULT_GROUP_NAME: authenticated
@@ -359,13 +363,13 @@ auth:
     GOTRUE_JWT_AUD: authenticated
     GOTRUE_JWT_EXP: "3600"
     GOTRUE_EXTERNAL_EMAIL_ENABLED: "true"
-    GOTRUE_MAILER_AUTOCONFIRM: "true"
+    GOTRUE_MAILER_AUTOCONFIRM: "false"
     # GOTRUE_MAILER_SECURE_EMAIL_CHANGE_ENABLED: true
     # GOTRUE_SMTP_MAX_FREQUENCY: 1s
-    GOTRUE_SMTP_ADMIN_EMAIL: "SMTP_ADMIN_MAIL"
-    GOTRUE_SMTP_HOST: "SMTP_HOST"
-    GOTRUE_SMTP_PORT: "SMTP_PORT"
-    GOTRUE_SMTP_SENDER_NAME: "SMTP_SENDER_NAME"
+    GOTRUE_SMTP_ADMIN_EMAIL: "noreply@paper.observer"
+    GOTRUE_SMTP_HOST: "smtp.purelymail.com"
+    GOTRUE_SMTP_PORT: "465"
+    GOTRUE_SMTP_SENDER_NAME: "Paper Observer"
     GOTRUE_EXTERNAL_PHONE_ENABLED: "false"
     GOTRUE_SMS_AUTOCONFIRM: "false"
     GOTRUE_MAILER_URLPATHS_INVITE: "/auth/v1/verify"
@@ -414,7 +418,7 @@ rest:
   image:
     repository: postgrest/postgrest
     pullPolicy: IfNotPresent
-    tag: "v13.0.6"
+    tag: "v13.0.7"
   imagePullSecrets: []
   nameOverride: ""
   fullnameOverride: ""
@@ -484,7 +488,7 @@ rest:
 # Realtime Service
 realtime:
   # Enable realtime provisioning
-  enabled: true
+  enabled: false
   image:
     repository: supabase/realtime
     pullPolicy: IfNotPresent
@@ -495,27 +499,27 @@ realtime:
   livenessProbe:
     exec:
       command:
-      - curl
-      - -sSfL
-      - --head
-      - -o
-      - /dev/null
-      - -H
-      - "Authorization: Bearer ${ANON_KEY}"
-      - http://localhost:4000/api/tenants/realtime-dev/health
+        - curl
+        - -sSfL
+        - --head
+        - -o
+        - /dev/null
+        - -H
+        - "Authorization: Bearer ${ANON_KEY}"
+        - http://localhost:4000/api/tenants/realtime-dev/health
     initialDelaySeconds: 5
     periodSeconds: 5
   readinessProbe:
     exec:
       command:
-      - curl
-      - -sSfL
-      - --head
-      - -o
-      - /dev/null
-      - -H
-      - "Authorization: Bearer ${ANON_KEY}"
-      - http://localhost:4000/api/tenants/realtime-dev/health
+        - curl
+        - -sSfL
+        - --head
+        - -o
+        - /dev/null
+        - -H
+        - "Authorization: Bearer ${ANON_KEY}"
+        - http://localhost:4000/api/tenants/realtime-dev/health
     initialDelaySeconds: 5
     periodSeconds: 5
   serviceAccount:
@@ -589,7 +593,7 @@ meta:
   image:
     repository: supabase/postgres-meta
     pullPolicy: IfNotPresent
-    tag: "v0.91.5"
+    tag: "v0.91.6"
   imagePullSecrets: []
   replicaCount: 1
   nameOverride: ""
@@ -661,7 +665,7 @@ storage:
   image:
     repository: supabase/storage-api
     pullPolicy: IfNotPresent
-    tag: "v1.26.4"
+    tag: "v1.27.4"
   imagePullSecrets: []
   replicaCount: 1
   nameOverride: ""
@@ -703,10 +707,10 @@ storage:
     type: ClusterIP
     port: 5000
   environment:
-    DB_SSL: disable  # disable, allow, prefer, require, verify-ca, verify-full
+    DB_SSL: disable # disable, allow, prefer, require, verify-ca, verify-full
     PGOPTIONS: -c search_path=storage,public
     FILE_SIZE_LIMIT: "52428800"
-    STORAGE_BACKEND: file  # file, s3
+    STORAGE_BACKEND: file # file, s3
     FILE_STORAGE_BACKEND_PATH: /var/lib/storage
     TENANT_ID: stub
     REGION: stub
@@ -764,7 +768,7 @@ imgproxy:
   image:
     repository: darthsim/imgproxy
     pullPolicy: IfNotPresent
-    tag: "v3.29.1"
+    tag: "v3.30.0"
   imagePullSecrets: []
   replicaCount: 1
   nameOverride: ""
@@ -772,15 +776,15 @@ imgproxy:
   livenessProbe:
     exec:
       command:
-      - imgproxy
-      - health
+        - imgproxy
+        - health
     initialDelaySeconds: 5
     periodSeconds: 5
   readinessProbe:
     exec:
       command:
-      - imgproxy
-      - health
+        - imgproxy
+        - health
     initialDelaySeconds: 5
     periodSeconds: 5
   serviceAccount:
@@ -900,21 +904,18 @@ kong:
     KONG_NGINX_PROXY_PROXY_BUFFERS: 64 160k
     KONG_LOG_LEVEL: warn
   ingress:
-    enabled: true
-    className: "nginx"
-    annotations:
-      nginx.ingress.kubernetes.io/rewrite-target: /
-      # cert-manager.io/cluster-issuer: "letsencrypt-staging"
-      # kubernetes.io/tls-acme: "true"
+    enabled: false # Using Istio VirtualService instead
+    className: ""
+    annotations: {}
     tls: []
       # Define TLS secret for SSL termination.
       # This section can be left blank if using cluster certificate manager.
       # Otherwise, setting this in tandem with certificate manager will overwrite the secret name.
       # - secretName: example-com-tls
       #   hosts:
-      #     - example.com
+      #     - api.paper.observer
     hosts:
-      - host: example.com
+      - host: api.paper.observer
         paths:
           - path: /
             pathType: Prefix
@@ -957,7 +958,7 @@ analytics:
   image:
     repository: supabase/logflare
     pullPolicy: IfNotPresent
-    tag: "1.20.1"
+    tag: "1.22.3"
   imagePullSecrets: []
   replicaCount: 1
   nameOverride: ""
@@ -1042,10 +1043,21 @@ analytics:
   tolerations: []
   affinity: {}
 
+# Istio Configuration
+istio:
+  # Enable Istio VirtualService creation
+  enabled: true
+  # Gateway to use for VirtualServices
+  gateway: "gateways/primary"
+  # Hostnames for services
+  hosts:
+    api: "api.paper.observer"
+    studio: "studio.paper.observer"
+
 # Vector
 vector:
   # Enable vector provisioning
-  enabled: true
+  enabled: false
   image:
     repository: timberio/vector
     pullPolicy: IfNotPresent
@@ -1125,7 +1137,7 @@ vector:
 # Functions
 functions:
   # Enable functions provisioning
-  enabled: true
+  enabled: false
   image:
     repository: supabase/edge-runtime
     pullPolicy: IfNotPresent
@@ -1202,7 +1214,7 @@ supavisor:
   image:
     repository: supabase/supavisor
     pullPolicy: IfNotPresent
-    tag: "2.6.2"
+    tag: "2.7.0"
   imagePullSecrets: []
   replicaCount: 1
   nameOverride: ""

@@ -1,0 +1,19 @@
+{{- if and .Values.studio.enabled .Values.istio.enabled }}
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: {{ include "supabase.fullname" . }}-studio
+  namespace: {{ .Release.Namespace }}
+spec:
+  hosts:
+    - {{ .Values.istio.hosts.studio | quote }}
+  gateways:
+    - {{ .Values.istio.gateway | quote }}
+  http:
+    - name: studio-dashboard
+      route:
+        - destination:
+            host: {{ include "supabase.fullname" . }}-supabase-kong
+            port:
+              number: 8000
+{{- end }}

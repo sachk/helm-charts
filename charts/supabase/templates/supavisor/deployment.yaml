@@ -63,6 +63,7 @@ spec:
               value: {{ include "supabase.database.supabase_db_name" . | quote }}
             - name: DATABASE_URL
               value: ecto://$(POSTGRES_USER):$(POSTGRES_PASSWORD)@$(POSTGRES_HOST):$(POSTGRES_PORT)/$(POSTGRES_DB)?sslmode=$(POSTGRES_SSL_MODE)
+            {{- if .Values.secret.realtime }}
             - name: SECRET_KEY_BASE
               valueFrom:
                 secretKeyRef:
@@ -73,6 +74,10 @@ spec:
                   name: {{ include "supabase.secret.realtime" . }}
                   key: secretKeyBase
                   {{- end }}
+            {{- else }}
+            - name: SECRET_KEY_BASE
+              value: "dummy-secret-key-base-for-supavisor"
+            {{- end }}
             - name: VAULT_ENC_KEY
               valueFrom:
                 secretKeyRef:
@@ -115,7 +120,7 @@ spec:
             {{- toYaml . | nindent 12 }}
           {{- end }}
           volumeMounts:
-            - mountPath: /etc/pooler
+            - mountPath: /etc/pooler/pooler.exs
               subPath: pooler.exs
               name: supavisor-pooler
       {{- with .Values.supavisor.nodeSelector }}

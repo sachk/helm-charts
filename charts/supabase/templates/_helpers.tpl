@@ -185,3 +185,124 @@ value: {{ .Values.external_db.password | quote }}
     - name: DB_USER
       value: {{ include "supabase.database.supabase_username" . | quote }}
 {{- end -}}
+
+{{/*
+Secret name helpers
+*/}}
+{{- define "supabase.secret.dashboard" -}}
+{{- if .Values.secret.dashboard.secretRef -}}
+{{- .Values.secret.dashboard.secretRef -}}
+{{- else -}}
+{{- include "supabase.fullname" . }}-dashboard
+{{- end -}}
+{{- end -}}
+
+{{- define "supabase.secret.jwt" -}}
+{{- if .Values.secret.jwt.secretRef -}}
+{{- .Values.secret.jwt.secretRef -}}
+{{- else -}}
+{{- include "supabase.fullname" . }}-jwt
+{{- end -}}
+{{- end -}}
+
+{{- define "supabase.secret.db" -}}
+{{- if .Values.secret.db.secretRef -}}
+{{- .Values.secret.db.secretRef -}}
+{{- else -}}
+{{- include "supabase.fullname" . }}-db
+{{- end -}}
+{{- end -}}
+
+{{- define "supabase.secret.realtime" -}}
+{{- if .Values.secret.realtime.secretRef -}}
+{{- .Values.secret.realtime.secretRef -}}
+{{- else -}}
+{{- include "supabase.fullname" . }}-realtime
+{{- end -}}
+{{- end -}}
+
+{{- define "supabase.secret.smtp" -}}
+{{- if .Values.secret.smtp.secretRef -}}
+{{- .Values.secret.smtp.secretRef -}}
+{{- else -}}
+{{- include "supabase.fullname" . }}-smtp
+{{- end -}}
+{{- end -}}
+
+{{- define "supabase.secret.analytics" -}}
+{{- if .Values.secret.analytics.secretRef -}}
+{{- .Values.secret.analytics.secretRef -}}
+{{- else -}}
+{{- include "supabase.fullname" . }}-analytics
+{{- end -}}
+{{- end -}}
+
+{{- define "supabase.secret.s3" -}}
+{{- if .Values.secret.s3.secretRef -}}
+{{- .Values.secret.s3.secretRef -}}
+{{- else -}}
+{{- include "supabase.fullname" . }}-s3
+{{- end -}}
+{{- end -}}
+
+{{- define "supabase.secret.pooler" -}}
+{{- if .Values.secret.pooler.secretRef -}}
+{{- .Values.secret.pooler.secretRef -}}
+{{- else -}}
+{{- include "supabase.fullname" . }}-pooler
+{{- end -}}
+{{- end -}}
+
+{{/*
+Secret validation helpers
+*/}}
+{{- define "supabase.secret.s3.isValid" -}}
+{{- if .Values.secret.s3 -}}
+true
+{{- else -}}
+false
+{{- end -}}
+{{- end -}}
+
+{{- define "supabase.secret.realtime.isValid" -}}
+{{- if .Values.secret.realtime -}}
+true
+{{- else -}}
+false
+{{- end -}}
+{{- end -}}
+
+{{- define "supabase.secret.smtp.isValid" -}}
+{{- if .Values.secret.smtp -}}
+true
+{{- else -}}
+false
+{{- end -}}
+{{- end -}}
+
+{{- define "supabase.secret.analytics.isValid" -}}
+{{- if .Values.secret.analytics -}}
+true
+{{- else -}}
+false
+{{- end -}}
+{{- end -}}
+
+{{- define "supabase.secret.pooler.isValid" -}}
+{{- if .Values.secret.pooler -}}
+true
+{{- else -}}
+false
+{{- end -}}
+{{- end -}}
+
+{{/*
+Component fullname helpers
+*/}}
+{{- define "supabase.kong.fullname" -}}
+{{- include "supabase.fullname" . }}-supabase-kong
+{{- end -}}
+
+{{- define "supabase.db.fullname" -}}
+{{- include "supabase.fullname" . }}-supabase-db
+{{- end -}}

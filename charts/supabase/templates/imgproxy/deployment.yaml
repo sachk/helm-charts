@@ -54,7 +54,7 @@ spec:
           {{- end }}
           ports:
             - name: http
-              containerPort: 8080
+              containerPort: 5001
               protocol: TCP
           {{- if or (.Values.imgproxy.persistence.enabled) (.Values.imgproxy.volumes) }}
           volumeMounts:
