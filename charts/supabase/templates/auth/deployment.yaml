@@ -92,6 +92,26 @@ spec:
                   name: {{ include "supabase.secret.smtp" . }}
                   key: password
                   {{- end }}
+            - name: GOTRUE_EXTERNAL_GOOGLE_CLIENT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: supabase-oauth
+                  key: google-client-id
+            - name: GOTRUE_EXTERNAL_GOOGLE_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: supabase-oauth
+                  key: google-secret
+            - name: GOTRUE_EXTERNAL_GITHUB_CLIENT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: supabase-oauth
+                  key: github-client-id
+            - name: GOTRUE_EXTERNAL_GITHUB_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: supabase-oauth
+                  key: github-secret
           {{- with .Values.auth.envFrom }}
           envFrom:
             {{- toYaml . | nindent 12 }}

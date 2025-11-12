@@ -132,7 +132,7 @@ db:
   image:
     repository: supabase/postgres
     pullPolicy: IfNotPresent
-    tag: "17.6.1.005"
+    tag: "15.8.1.085"
   imagePullSecrets: []
   replicaCount: 1
   nameOverride: ""
@@ -221,7 +221,7 @@ studio:
   image:
     repository: supabase/studio
     pullPolicy: IfNotPresent
-    tag: "2025.09.22-sha-7b3007d"
+    tag: "2025.11.10-sha-5291fe3"
   imagePullSecrets: []
   replicaCount: 1
   nameOverride: ""
@@ -310,7 +310,7 @@ auth:
   image:
     repository: supabase/gotrue
     pullPolicy: IfNotPresent
-    tag: "v2.179.0"
+    tag: "v2.182.1"
   imagePullSecrets: []
   replicaCount: 1
   nameOverride: ""
@@ -356,7 +356,6 @@ auth:
     GOTRUE_API_HOST: "0.0.0.0"
     GOTRUE_API_PORT: "9999"
     GOTRUE_SITE_URL: https://paper.observer
-    GOTRUE_URI_ALLOW_LIST: "*"
     GOTRUE_DISABLE_SIGNUP: "false"
     GOTRUE_JWT_DEFAULT_GROUP_NAME: authenticated
     GOTRUE_JWT_ADMIN_ROLES: service_role
@@ -376,6 +375,12 @@ auth:
     GOTRUE_MAILER_URLPATHS_CONFIRMATION: "/auth/v1/verify"
     GOTRUE_MAILER_URLPATHS_RECOVERY: "/auth/v1/verify"
     GOTRUE_MAILER_URLPATHS_EMAIL_CHANGE: "/auth/v1/verify"
+    GOTRUE_EXTERNAL_GITHUB_ENABLED: "true"
+    GOTRUE_EXTERNAL_GITHUB_REDIRECT_URI: "https://api.paper.observer/auth/v1/callback"
+    GOTRUE_EXTERNAL_GOOGLE_ENABLED: "true"
+    GOTRUE_EXTERNAL_GOOGLE_REDIRECT_URI: "https://api.paper.observer/auth/v1/callback"
+    GOTRUE_URI_ALLOW_LIST: "https://paper.observer/**,https://api.paper.observer/**"
+    GOTRUE_MAILER_EXTERNAL_HOSTS: "localhost,kong,paper.observer,api.paper.observer"
   envFrom: []
     # - secretRef:
     #     name: env-secret
@@ -665,7 +670,7 @@ storage:
   image:
     repository: supabase/storage-api
     pullPolicy: IfNotPresent
-    tag: "v1.27.4"
+    tag: "v1.29.0"
   imagePullSecrets: []
   replicaCount: 1
   nameOverride: ""
@@ -768,7 +773,7 @@ imgproxy:
   image:
     repository: darthsim/imgproxy
     pullPolicy: IfNotPresent
-    tag: "v3.30.0"
+    tag: "v3.8.0"
   imagePullSecrets: []
   replicaCount: 1
   nameOverride: ""
@@ -863,7 +868,7 @@ kong:
   image:
     repository: kong
     pullPolicy: IfNotPresent
-    tag: "3.9.1"
+    tag: "2.8.1"
   imagePullSecrets: []
   replicaCount: 1
   nameOverride: ""
@@ -958,7 +963,7 @@ analytics:
   image:
     repository: supabase/logflare
     pullPolicy: IfNotPresent
-    tag: "1.22.3"
+    tag: "1.22.6"
   imagePullSecrets: []
   replicaCount: 1
   nameOverride: ""
@@ -1214,7 +1219,7 @@ supavisor:
   image:
     repository: supabase/supavisor
     pullPolicy: IfNotPresent
-    tag: "2.7.0"
+    tag: "2.7.4"
   imagePullSecrets: []
   replicaCount: 1
   nameOverride: ""
